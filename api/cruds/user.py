@@ -85,6 +85,27 @@ async def update_user_location(
     await db.refresh(original)
     return original
 
+async def update_user_location_status(
+        db: AsyncSession, user_update: user_schema.UserUpdateLocation, original: user_model.User, status: str
+) -> user_model.User:
+    original.now_location = user_update.now_location
+    original.status = status
+    db.add(original)
+    await db.commit()
+    await db.refresh(original)
+    return original
+
+async def update_user_location_status_flag(
+        db: AsyncSession, user_update: user_schema.UserUpdateLocation, original: user_model.User
+) -> user_model.User:
+    original.now_location = user_update.now_location
+    original.location_flag = True
+    original.status = "出席"
+    db.add(original)
+    await db.commit()
+    await db.refresh(original)
+    return original
+
 async def delete_user(db: AsyncSession, original: user_model.User) -> None:
     await db.delete(original)
     await db.commit()

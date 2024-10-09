@@ -60,6 +60,8 @@ async def create_user(
     name: str = Form(...),
     status: str = Form(...),
     firebase_user_id: str = Form(...),
+    now_location: str = Form(...),
+    location_flag: bool = Form(...),
     db: AsyncSession = Depends(get_db),
 ):
    file_contents = await file.read()  # ファイルの内容を読み取る
@@ -74,7 +76,8 @@ async def create_user(
        "firebase_user_id": firebase_user_id,
        "file_name": file.filename,
        "bytes_data": image_data,
-       "now_location": "キャンパス外",
+       "now_location": now_location,
+       "location_flag": location_flag,
    }
    user_body = user_schema.UserCreate(**user_create_data)
    return await user_crud.create_user(db, user_body)
@@ -156,12 +159,22 @@ async def update_user_location(
     user = await user_crud.get_firebase_user(db, firebase_user_id=firebase_user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    update_user_location = await user_crud.update_user_location(db, user_body, original=user)
 
     if user.now_location == user_body.now_location:
         return JSONResponse(content={"message": "Status send successfully"})
     else:
+        if user.location_flag == True :
+            if user_body.now_location == "研究室内" :
+                update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="出席")
+            elif user_body.now_location == "キャンパス外" :
+                update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="帰宅")
+            else :
+                update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="一時退席")
+        else :
+            if user_body.now_location == "研究室内" :
+                update_user_location = await user_crud.update_user_location_status_flag(db, user_body, original=user)
+            else :
+                update_user_location = await user_crud.update_user_location(db, user_body, original=user)
         # 更新が成功した後、WebSocketを通じてユーザーにメッセージを送信
         message = {"user_id": user.id, "now_location": update_user_location.now_location}
         await connection_manager.broadcast(message)

@@ -1,4 +1,4 @@
-from  sqlalchemy import Column, Integer, String, LargeBinary
+from  sqlalchemy import Column, Integer, String, LargeBinary, Boolean
 from sqlalchemy.orm import relationship
 
 from api.db import Base
@@ -16,6 +16,7 @@ class User(Base):
     file_name = Column(String(256))
     bytes_data = Column(LargeBinary(length=(2**32)-1))
     now_location = Column(String(256))
+    location_flag = Column(Boolean)
 
     events = relationship("Event", back_populates="user")
     attendances = relationship("Attendance", back_populates="user")

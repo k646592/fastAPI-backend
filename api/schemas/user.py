@@ -12,6 +12,7 @@ class UserBase(BaseModel):
    file_name: str
    bytes_data: bytes
    now_location: str | None = Field(None, example="キャンパス外")
+   location_flag: bool
 
 
 class UserCreate(UserBase):
@@ -96,6 +97,7 @@ class UserGetBase(BaseModel):
    status: str | None = Field(None, example="出席")
    file_name: str
    now_location: str
+   location_flag: bool
    bytes_data: bytes
 
 
