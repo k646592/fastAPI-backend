@@ -8,6 +8,7 @@ import api.cruds.user as user_crud
 from api.db import get_db
 
 import api.schemas.user as user_schema
+import api.routers.attendance as attendance_router
 
 router = APIRouter()
 
@@ -166,13 +167,21 @@ async def update_user_location(
         if user.location_flag == True :
             if user_body.now_location == "研究室内" :
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="出席")
+                message_status = {"user_id": user.id, "status": update_user_location.status}
+                await attendance_router.connection_manager.broadcast(message_status)
             elif user_body.now_location == "キャンパス外" :
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="帰宅")
+                message_status = {"user_id": user.id, "status": update_user_location.status}
+                await attendance_router.connection_manager.broadcast(message_status)
             else :
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="一時退席")
+                message_status = {"user_id": user.id, "status": update_user_location.status}
+                await attendance_router.connection_manager.broadcast(message_status)
         else :
             if user_body.now_location == "研究室内" :
                 update_user_location = await user_crud.update_user_location_status_flag(db, user_body, original=user)
+                message_status = {"user_id": user.id, "status": update_user_location.status}
+                await attendance_router.connection_manager.broadcast(message_status)
             else :
                 update_user_location = await user_crud.update_user_location(db, user_body, original=user)
         # 更新が成功した後、WebSocketを通じてユーザーにメッセージを送信
