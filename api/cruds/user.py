@@ -40,9 +40,9 @@ async def get_firebase_user_name_id(db: AsyncSession, firebase_user_id: str) -> 
     )
     return result.scalars().first()
 
-async def get_user(db: AsyncSession, user_id: int) -> user_model.User | None:
+async def get_user(db: AsyncSession, id: int) -> user_model.User | None:
     result: Result = await db.execute(
-        select(user_model.User).filter(user_model.User.id == user_id)
+        select(user_model.User).filter(user_model.User.id == id)
     )
     return result.scalars().first()
 
