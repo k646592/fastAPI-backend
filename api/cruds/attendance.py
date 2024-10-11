@@ -37,9 +37,11 @@ async def update_user_status_newday(db: AsyncSession):
             print("ユーザーが見つかりませんでした")
             return
 
-        # 全てのユーザーのステータスを「未出席」に更新
+        # 全てのユーザーのステータスを「未出席」, flagをfalse, locationを「キャンパス外]に更新
         for user in users:
             user.status = "未出席"
+            user.location_flag = False
+            user.now_location = "キャンパス外"
 
         # 現在の日付を取得（タイムゾーンは適宜設定）
         today = datetime.now(pytz.timezone('Asia/Tokyo')).date()
