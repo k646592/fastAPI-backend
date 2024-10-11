@@ -20,7 +20,7 @@ async def send_mail(
    message = MIMEMultipart()
    message["Subject"] = subject
    message["From"] = formataddr((name, from_email))
-   message["To"] = "k646592@kansai-u.ac.jp"
+   message["To"] = "ebara@kansai-u.ac.jp"
    text = MIMEText(text)
    message.attach(text)
    try:
