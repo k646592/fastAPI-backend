@@ -125,7 +125,7 @@ async def update_user_image(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
-    user = await user_crud.get_user(db, user_id=user_id)
+    user = await user_crud.get_user(db, id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -145,7 +145,7 @@ async def update_user_email(
     user_body: user_schema.UserUpdateEmail,
     db: AsyncSession = Depends(get_db),
 ):
-    user = await user_crud.get_user(db, user_id=user_id)
+    user = await user_crud.get_user(db, id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -194,7 +194,7 @@ async def update_user_location(
 
 @router.delete("/users/{user_id}", response_model=None)
 async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
-    user = await user_crud.get_user(db, user_id=user_id)
+    user = await user_crud.get_user(db, id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
