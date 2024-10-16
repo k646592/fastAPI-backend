@@ -24,6 +24,15 @@ class Meeting(MeetingBase):
     class Config:
         from_attributes = True
 
+class GetMeetingMainTextBase(BaseModel):
+    main_text: str 
+
+class GetMeetingMainText(GetMeetingMainTextBase):
+   id: int
+
+   class Config:
+       from_attributes = True
+
 class MeetingWithUserName(BaseModel):
     id: int
     title: str
