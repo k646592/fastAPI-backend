@@ -17,7 +17,15 @@ async def get_meeting(
     id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    return await meeting_crud.get_meeting(db, id=id)
+    meeting = await meeting_crud.get_meeting(db, id=id)
+    # meetingt_dataオブジェクトを作成
+    meeting_data = {
+        "main_text": meeting.main_text,
+        "id": meeting.id,
+    }
+    meeting_get = meeting_schema.GetMeetingMainText(**meeting_data)
+
+    return meeting_get
 
 @router.post("/meetings", response_model=meeting_schema.MeetingCreateResponse)
 async def create_meeting(
