@@ -12,7 +12,7 @@ router = APIRouter()
 async def list_meetings(db: AsyncSession = Depends(get_db)):
     return await meeting_crud.get_meetings(db)
 
-@router.get("meetings/{id}", response_model=meeting_schema.GetMeetingMainText)
+@router.get("/meetings/{id}", response_model=meeting_schema.GetMeetingMainText)
 async def get_meeting(
     id: int,
     db: AsyncSession = Depends(get_db)
