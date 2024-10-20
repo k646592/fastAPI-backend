@@ -6,6 +6,7 @@ from api.db import get_db
 from datetime import datetime
 import json
 import base64
+import pytz
 
 import api.schemas.chat as chat_schema
 import api.schemas.user as user_schema
@@ -71,7 +72,7 @@ async def websocket_endpoint(websocket: WebSocket, chat_room_id: int, user_id: i
                 "user_id": user_id,
                 "private_chat_room_id": chat_room_id,
                 "content": data_json["content"],
-                "sent_at": datetime.utcnow(),
+                "sent_at": datetime.now(pytz.timezone('Asia/Tokyo')),
                 "is_read": False,
                 "image_data": base64.b64decode(data_json["image_data"]),
                 "file_data": base64.b64decode(data_json["file_data"]),
@@ -111,7 +112,7 @@ async def websocket_group_endpoint(websocket: WebSocket, group_chat_room_id: int
                 "user_id": user_id,
                 "group_chat_room_id": group_chat_room_id,
                 "content": data_json["content"],
-                "sent_at": datetime.utcnow(),
+                "sent_at": datetime.now(pytz.timezone('Asia/Tokyo')),
                 "is_read": False,
                 "image_data": base64.b64decode(data_json["image_data"]),
                 "file_data": base64.b64decode(data_json["file_data"]),
