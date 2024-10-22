@@ -23,6 +23,8 @@ async def get_user(db: AsyncSession, user_id: int) -> user_model.User | None:
 async def update_user_status(
         db: AsyncSession, user_update_status: attendance_schema.UserUpdateStatus, original: user_model.User
 ) -> user_model.User:
+    if user_update_status.status == "出席" and not original.location_flag :
+        original.location_flag = True
     original.status = user_update_status.status
     db.add(original)
     await db.commit()
