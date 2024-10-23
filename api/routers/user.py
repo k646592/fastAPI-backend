@@ -165,7 +165,7 @@ async def update_user_location(
         if user.status == "授業中" :
             update_user_location = await user_crud.update_user_location(db, user_body, original=user)
         else :
-            if user_body.now_location == "研究室内" :
+            if user_body.now_location == "研究室内" or user_body.now_location == "第２研究室内":
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="出席")
                 message_status = {"user_id": user.id, "status": update_user_location.status}
                 await attendance_router.connection_manager.broadcast(message_status)
