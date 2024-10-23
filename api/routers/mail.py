@@ -17,8 +17,8 @@ async def send_mail(
    smtp_server = "158.217.174.41"
    port = 25
 
-   # subjectの末尾に「New ReCSから送信」を追記
-   subject += " New ReCSから送信"
+   # subjectの先頭に「【New ReCS】」を追加
+   subject = f"【New ReCS】{subject}"
   
    message = MIMEMultipart()
    message["Subject"] = subject
