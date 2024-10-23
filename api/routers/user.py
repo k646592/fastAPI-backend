@@ -160,9 +160,7 @@ async def update_user_location(
     user = await user_crud.get_firebase_user(db, firebase_user_id=firebase_user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-
-    if user.now_location == user_body.now_location:
-        return JSONResponse(content={"message": "Status send successfully"})
+    
     else:
         if user.location_flag == True :
             if user.status == "授業中" :
