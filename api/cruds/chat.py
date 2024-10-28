@@ -41,7 +41,7 @@ async def get_private_messages(db: AsyncSession, private_chat_room_id: int) -> l
     result = await db.execute(
         select(chat_model.PrivateMessage)
         .where(chat_model.PrivateMessage.private_chat_room_id == private_chat_room_id)
-        .order_by(chat_model.PrivateMessage.sent_at)
+        .order_by(chat_model.PrivateMessage.sent_at.desc())
     )
     messages = result.scalars().all()
     
@@ -132,7 +132,7 @@ async def get_group_messages(db: AsyncSession, group_chat_room_id: int) -> list[
     result = await db.execute(
         select(chat_model.GroupMessage)
         .where(chat_model.GroupMessage.group_chat_room_id == group_chat_room_id)
-        .order_by(chat_model.GroupMessage.sent_at)
+        .order_by(chat_model.GroupMessage.sent_at.desc())
     )
     messages = result.scalars().all()
     
