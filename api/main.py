@@ -7,7 +7,7 @@ import os
 import logging
 
 from api.db import async_session
-from api.routers import event, user, attendance, mail, chat, meeting, door_state_manager
+from api.routers import event, user, attendance, mail, chat, meeting, door_state_manager, board
 import api.cruds.attendance as attendance_crud
 
 app = FastAPI()
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 origins = [
     os.getenv("FRONTEND_DOMAIN", "http://localhost"),
     os.getenv("FRONTEND_DOMAIN_DEV", "http://localhost:8000"),
-    os.getenv("FRONTEND_DOMAIN_DEV_ALT", "http://localhost:63653")
+    os.getenv("FRONTEND_DOMAIN_DEV_ALT", "http://localhost:58636")
 ]
 
 app.add_middleware(
@@ -65,3 +65,4 @@ app.include_router(mail.router)
 app.include_router(chat.router)
 app.include_router(meeting.router)
 app.include_router(door_state_manager.router)
+app.include_router(board.router)

@@ -3,6 +3,7 @@ import os
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
+from api.models.board import Base
 from api.models.event import Base
 from api.models.attendance import Base
 from api.models.user import Base

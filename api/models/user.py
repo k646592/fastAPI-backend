@@ -1,6 +1,5 @@
-from  sqlalchemy import Column, Integer, String, LargeBinary, Boolean
+from sqlalchemy import Column, Integer, String, LargeBinary, Boolean
 from sqlalchemy.orm import relationship
-
 from api.db import Base
 
 class User(Base):
@@ -20,8 +19,9 @@ class User(Base):
 
     events = relationship("Event", back_populates="user")
     attendances = relationship("Attendance", back_populates="user")
-    private_messages = relationship("PrivateMessage",back_populates="user" )
+    private_messages = relationship("PrivateMessage", back_populates="user")
     private_chat_rooms_users = relationship("PrivateChatRoomUser", back_populates="user")
-    group_messages = relationship("GroupMessage",back_populates="user" )
+    group_messages = relationship("GroupMessage", back_populates="user")
     group_chat_rooms_users = relationship("GroupChatRoomUser", back_populates="user")
     meetings = relationship("Meeting", back_populates="user")
+    boards = relationship("Board", back_populates="user")
