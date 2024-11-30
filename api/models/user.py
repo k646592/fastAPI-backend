@@ -25,3 +25,4 @@ class User(Base):
     group_chat_rooms_users = relationship("GroupChatRoomUser", back_populates="user")
     meetings = relationship("Meeting", back_populates="user")
     boards = relationship("Board", back_populates="user")
+    acknowledgements = relationship("Acknowledgement", back_populates="user")

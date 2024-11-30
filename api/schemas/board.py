@@ -22,10 +22,38 @@ class Board(BoardBase):
     class Config:
         from_attributes = True
 
-class BoardWithUserName(BaseModel):
+class BoardWithOtherInfo(BaseModel):
     id: int
     content: str | None = Field(None, example="テスト掲示板文章")
     created_at: datetime | None = Field(datetime.now())
     group: str | None = Field(None, example="All")
     user_id: int
     user_name: str
+    acknowledgements: int
+    is_acknowledged: bool
+
+class AcknowledgementBase(BaseModel):
+    board_id: int
+    user_id: int
+    created_at: datetime | None = Field(datetime.now())
+
+class AcknowledgementCreate(AcknowledgementBase):
+    pass
+
+class AcknowledgementCreateResponse(AcknowledgementCreate):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class Acknowledgement(AcknowledgementBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class AcknowledgementsWithUserInfo(BaseModel):
+    created_at: datetime | None = Field(datetime.now())
+    user_id: int
+    user_name: str
+    bytes_data: bytes

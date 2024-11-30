@@ -13,3 +13,17 @@ class Board(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     
     user = relationship("User", back_populates="boards")
+    acknowledgements = relationship("Acknowledgement", back_populates="board")
+
+
+# 了解機能の中間テーブル
+class Acknowledgement(Base):
+    __tablename__ = "acknowledgements"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    board_id = Column(Integer, ForeignKey("boards.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, nullable=False)
+
+    board = relationship("Board", back_populates="acknowledgements")
+    user = relationship("User", back_populates="acknowledgements")
