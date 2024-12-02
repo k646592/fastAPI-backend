@@ -160,32 +160,41 @@ async def update_user_location(
     user = await user_crud.get_firebase_user(db, firebase_user_id=firebase_user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    status = "未出席"
 
     if user.location_flag == True :
         if user.status == "授業中" :
             update_user_location = await user_crud.update_user_location(db, user_body, original=user)
+            status = "授業中"
         else :
             if user_body.now_location == "研究室内" or user_body.now_location == "第２研究室内" or user_body.now_location == "榎原先生の自室":
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="出席")
                 message_status = {"user_id": user.id, "status": update_user_location.status}
+                status = update_user_location.status
                 await attendance_router.connection_manager.broadcast(message_status)
             elif user_body.now_location == "キャンパス外" :
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="帰宅")
                 message_status = {"user_id": user.id, "status": update_user_location.status}
+                status = update_user_location.status
                 await attendance_router.connection_manager.broadcast(message_status)
             else :
                 update_user_location = await user_crud.update_user_location_status(db, user_body, original=user, status="一時退席")
                 message_status = {"user_id": user.id, "status": update_user_location.status}
+                status = update_user_location.status
                 await attendance_router.connection_manager.broadcast(message_status)
     else :
         if user_body.now_location == "研究室内" or user_body.now_location == "榎原先生の自室":
             update_user_location = await user_crud.update_user_location_status_flag(db, user_body, original=user)
             message_status = {"user_id": user.id, "status": update_user_location.status}
+            status = update_user_location.status
             await attendance_router.connection_manager.broadcast(message_status)
         else :
+            if user.status == "授業中" :
+                status = "授業中"
             update_user_location = await user_crud.update_user_location(db, user_body, original=user)
     # 更新が成功した後、WebSocketを通じてユーザーにメッセージを送信
-    message = {"user_id": user.id, "now_location": update_user_location.now_location}
+    message = {"user_id": user.id, "now_location": update_user_location.now_location, "status": status}
     await connection_manager.broadcast(message)
     return update_user_location    
 
