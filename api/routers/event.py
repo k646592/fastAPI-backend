@@ -85,6 +85,17 @@ async def update_event(
         raise HTTPException(status_code=404, detail="Event not found")
     
     updated_event = await event_crud.update_event(db, event_body, original=event)
+    message = {
+                "action": "update",  # 追加: アクションの種類を指定
+                "id": updated_event.id, 
+                "title": updated_event.title,
+                "description": updated_event.description, 
+                "mail_send": updated_event.mail_send,
+                "start": event_body.start.isoformat(), 
+                "end": event_body.end.isoformat(), 
+                "unit": updated_event.unit,
+    }
+    await connection_event_manager.broadcast(message)
     return updated_event
 
 @router.delete("/events/{id}", response_model=None)

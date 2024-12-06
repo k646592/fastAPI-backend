@@ -139,6 +139,18 @@ async def update_attendance(
         raise HTTPException(status_code=404, detail="Attendance not found")
     
     updated_attendance = await attendance_crud.update_attendance(db, attendance_body, original=attendance)
+
+    message = {
+                "action": "update",  # 追加: アクションの種類を指定
+                "id": updated_attendance.id, 
+                "title": updated_attendance.title,
+                "description": updated_attendance.description, 
+                "mail_send": updated_attendance.mail_send, 
+                "start": attendance_body.start.isoformat(), 
+                "end": attendance_body.end.isoformat(), 
+                "undecided": updated_attendance.undecided,
+    }
+    await connection_attendance_manager.broadcast(message)
     return updated_attendance
 
 @router.delete("/attendances/{id}", response_model=None)
