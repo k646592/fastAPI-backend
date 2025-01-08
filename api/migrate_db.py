@@ -7,9 +7,10 @@ from api.models.board import Base
 from api.models.event import Base
 from api.models.attendance import Base
 from api.models.user import Base
-from api.models.chat import Base
+from api.models.private_chat import Base
 from api.models.meeting import Base
 from api.models.door_state_manager import Base
+from api.models.group_chat import Base
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

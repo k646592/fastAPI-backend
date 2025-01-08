@@ -14,7 +14,7 @@ async def get_users(db: AsyncSession) -> list[user_model.User]:
     result = await db.execute(select(user_model.User))
     return result.scalars().all()
 
-async def get_user(db: AsyncSession, user_id: int) -> user_model.User | None:
+async def get_user(db: AsyncSession, user_id: str) -> user_model.User | None:
     result: Result = await db.execute(
         select(user_model.User).filter(user_model.User.id == user_id)
     )
@@ -113,7 +113,6 @@ async def update_attendance(
 ) -> attendance_model.Attendance:
     original.title = attendance_update.title
     original.description = attendance_update.description
-    original.user_id = attendance_update.user_id
     original.start = attendance_update.start
     original.end = attendance_update.end
     original.mail_send = attendance_update.mail_send

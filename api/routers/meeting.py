@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import api.cruds.meeting as meeting_crud
@@ -9,8 +9,12 @@ import api.schemas.meeting as meeting_schema
 router = APIRouter()
 
 @router.get("/meetings", response_model=list[meeting_schema.MeetingWithUserName])
-async def list_meetings(db: AsyncSession = Depends(get_db)):
-    return await meeting_crud.get_meetings(db)
+async def list_meetings(
+    team: str = Query(..., description="Team name to filter"),  # 必須のクエリパラメータとして定義
+    kinds: str = Query(..., description="Kinds to filter"),     # 必須のクエリパラメータとして定義
+    db: AsyncSession = Depends(get_db)
+):
+    return await meeting_crud.get_meetings(team=team,kinds=kinds,db=db)
 
 @router.get("/meetings/{id}", response_model=meeting_schema.GetMeetingMainText)
 async def get_meeting(

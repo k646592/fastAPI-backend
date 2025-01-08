@@ -10,7 +10,7 @@ class Board(Base):
     content = Column(Text)
     created_at = Column(DateTime)
     group = Column(String(128))
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user_id = Column(String(32), ForeignKey("users.id"), nullable=False, index=True)
     
     user = relationship("User", back_populates="boards")
     acknowledgements = relationship("Acknowledgement", back_populates="board")
@@ -22,7 +22,7 @@ class Acknowledgement(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     board_id = Column(Integer, ForeignKey("boards.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String(32), ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, nullable=False)
 
     board = relationship("Board", back_populates="acknowledgements")

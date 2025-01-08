@@ -12,7 +12,7 @@ class Attendance(Base):
     start = Column(DateTime)
     end = Column(DateTime)
     mail_send = Column(Boolean)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String(32), ForeignKey("users.id"), nullable=False)
     undecided = Column(Boolean)
     
     user = relationship("User", back_populates="attendances")

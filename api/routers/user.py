@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form, WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import JSONResponse
-import base64
 import json 
+
+from minio import Minio
 
 import api.cruds.user as user_crud
 from api.db import get_db
@@ -10,7 +11,26 @@ from api.db import get_db
 import api.schemas.user as user_schema
 import api.routers.attendance as attendance_router
 
+# MinIO client configuration
+MINIO_URL = "minio:9000"
+MINIO_ACCESS_KEY = "minioadmin"
+MINIO_SECRET_KEY = "minioadmin"
+MINIO_BUCKET = "user-images"
+minio_client = Minio(
+    MINIO_URL,
+    access_key=MINIO_ACCESS_KEY,
+    secret_key=MINIO_SECRET_KEY,
+    secure=False,
+)
+
+# Ensure the bucket exists
+if not minio_client.bucket_exists(MINIO_BUCKET):
+    minio_client.make_bucket(MINIO_BUCKET)
+
+
 router = APIRouter()
+
+# idは、firebase_user_idでstr
 
 class ConnectionManager:
     def __init__(self):
@@ -44,72 +64,72 @@ async def websocket_endpoint(websocket: WebSocket):
         connection_manager.disconnect(websocket)
         print(f"WebSocket Error: {e}")  # エラーログを出力
 
+# 一覧取得のエンドポインt
 @router.get("/users", response_model=list[user_schema.User])
 async def list_users(db: AsyncSession = Depends(get_db)):
     return await user_crud.get_users(db)
 
-@router.get("/chat_users/{firebase_user_id}", response_model=list[user_schema.User])
-async def list_chat_users(firebase_user_id: str, db: AsyncSession = Depends(get_db)):
-    return await user_crud.get_chat_users(db, firebase_user_id)
+# firebase_user_idのuserを取得するエンドポイント
+@router.get("/users/{id}", response_model=user_schema.UserGet)
+async def get_user(
+    id: str, 
+    db: AsyncSession = Depends(get_db)
+):
+    return await user_crud.get_user(db=db, id=id)
 
+# 新規登録のエンドポイント
 @router.post("/users", response_model=user_schema.UserCreateResponse)
 async def create_user(
-    file: UploadFile = File(...),
+    firebase_user_id: str = Form(...),
     email: str = Form(...),
     grade: str = Form(...),
     group: str = Form(...),
     name: str = Form(...),
     status: str = Form(...),
-    firebase_user_id: str = Form(...),
     now_location: str = Form(...),
     location_flag: bool = Form(...),
+    image: UploadFile = None,
     db: AsyncSession = Depends(get_db),
 ):
-   file_contents = await file.read()  # ファイルの内容を読み取る
-   image_data = base64.b64encode(file_contents).decode("utf-8")
-   # UserCreateオブジェクトを作成
-   user_create_data = {
+    
+
+    # Upload image to MinIO if provided
+    if image:
+        image_name = f"{firebase_user_id}/{image.filename}"
+        minio_client.put_object(
+            MINIO_BUCKET,
+            image_name,
+            image.file,
+            length=-1,  # Calculate automatically
+            part_size=10 * 1024 * 1024,  # 10 MB
+            content_type=image.content_type,
+        )
+        image_url = f"http://localhost:9000/{MINIO_BUCKET}/{image_name}"
+    else:
+        image_name = ""
+        image_url = ""
+
+    # Create the user instance
+    user_create_data = {
+       "id": firebase_user_id,
        "email": email,
        "grade": grade,
        "group": group,
        "name": name,
        "status": status,
-       "firebase_user_id": firebase_user_id,
-       "file_name": file.filename,
-       "bytes_data": image_data,
        "now_location": now_location,
        "location_flag": location_flag,
+       "image_name": image_name,
+       "image_url": image_url,
    }
-   user_body = user_schema.UserCreate(**user_create_data)
-   return await user_crud.create_user(db, user_body)
+    
+    
+    return await user_crud.create_user(db, user_create_data=user_create_data)
 
-@router.get("/get_user_name/{id}", response_model=user_schema.UserGetName)
-async def get_user_name(
-    id:int, db: AsyncSession = Depends(get_db)
-):
-    return await user_crud.get_user_name(db, id=id)
-
-@router.get("/users/{firebase_user_id}", response_model=user_schema.UserGet)
-async def read_user(
-    firebase_user_id: str, db: AsyncSession = Depends(get_db)
-):
-    return await user_crud.get_firebase_user(db, firebase_user_id=firebase_user_id)
-
-@router.get("/user_id/{firebase_user_id}", response_model=user_schema.UserGetId)
-async def read_user_id(
-    firebase_user_id: str, db: AsyncSession = Depends(get_db)
-):
-    return await user_crud.get_firebase_user(db, firebase_user_id=firebase_user_id)
-
-@router.get("/user_name_id/{firebase_user_id}", response_model=user_schema.UserGetNameId)
-async def read_user_name_id(
-    firebase_user_id: str, db: AsyncSession = Depends(get_db)
-):
-    return await user_crud.get_firebase_user_name_id(db, firebase_user_id=firebase_user_id)
-
+# ユーザ情報（image以外）のエンドポイント
 @router.patch("/users/{id}", response_model=user_schema.UserUpdateResponse)
 async def update_user(
-    id: int, 
+    id: str, 
     user_body: user_schema.UserUpdate,
     db: AsyncSession = Depends(get_db),
 ):
@@ -121,35 +141,43 @@ async def update_user(
 
 @router.patch("/users/image/{user_id}", response_model=user_schema.UserUpdateImageResponse)
 async def update_user_image(
-    user_id: int,
-    file: UploadFile = File(...),
+    user_id: str,
+    image: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
     user = await user_crud.get_user(db, id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    file_contents = await file.read()  # ファイルの内容を読み取る
-    image_data = base64.b64encode(file_contents).decode("utf-8")
-    # UserUpdateオブジェクトを作成
+    # Upload image to MinIO if provided
+    if image:
+        image_name = f"{user_id}/{image.filename}"
+        minio_client.put_object(
+            MINIO_BUCKET,
+            image_name,
+            image.file,
+            length=-1,  # Calculate automatically
+            part_size=10 * 1024 * 1024,  # 10 MB
+            content_type=image.content_type,
+        )
+        image_url = f"http://localhost:9000/{MINIO_BUCKET}/{image_name}"
+        try:
+            # MinIOから画像を削除
+            await delete_user_image(user_id=user_id, image_name=user.image_name)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")
+    else:
+        image_name = ""
+        image_url = ""
+
+    # Create the user instance
     user_update_data = {
-       "file_name": file.filename,
-       "bytes_data": image_data,
-    }
+       "image_name": image_name,
+       "image_url": image_url,
+   }
+    
     user_body = user_schema.UserUpdateImage(**user_update_data)
     return await user_crud.update_user_image(db, user_body, original=user)
-
-@router.patch("/users/email/{user_id}", response_model=user_schema.UserUpdateEmailResponse)
-async def update_user_email(
-    user_id: int, 
-    user_body: user_schema.UserUpdateEmail,
-    db: AsyncSession = Depends(get_db),
-):
-    user = await user_crud.get_user(db, id=user_id)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return await user_crud.update_user_email(db, user_body, original=user)
 
 @router.patch("/update_user_location/{firebase_user_id}", response_model=user_schema.UserUpdateLocationResponse)
 async def update_user_location(
@@ -157,7 +185,7 @@ async def update_user_location(
     user_body: user_schema.UserUpdateLocation,
     db: AsyncSession = Depends(get_db),
 ):
-    user = await user_crud.get_firebase_user(db, firebase_user_id=firebase_user_id)
+    user = await user_crud.get_user(db, id=firebase_user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -196,12 +224,39 @@ async def update_user_location(
     # 更新が成功した後、WebSocketを通じてユーザーにメッセージを送信
     message = {"user_id": user.id, "now_location": update_user_location.now_location, "status": status}
     await connection_manager.broadcast(message)
-    return update_user_location    
+    return update_user_location
+
+@router.get("/get_user_name/{id}", response_model=user_schema.UserGetName)
+async def get_user_name(
+    id:str, db: AsyncSession = Depends(get_db)
+):
+    return await user_crud.get_user_name(db, id=id)
+
+@router.patch("/users/email/{user_id}", response_model=user_schema.UserUpdateEmailResponse)
+async def update_user_email(
+    user_id: str, 
+    user_body: user_schema.UserUpdateEmail,
+    db: AsyncSession = Depends(get_db),
+):
+    user = await user_crud.get_user(db, id=user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return await user_crud.update_user_email(db, user_body, original=user)    
 
 @router.delete("/users/{user_id}", response_model=None)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)):
     user = await user_crud.get_user(db, id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
     return await user_crud.delete_user(db, original=user)
+
+
+# 画像削除用の関数
+async def delete_user_image(user_id: str, image_name: str):
+    try:
+        # MinIOから画像を削除
+        minio_client.remove_object(MINIO_BUCKET, f"{user_id}/{image_name}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")

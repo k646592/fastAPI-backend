@@ -5,7 +5,7 @@ class EventBase(BaseModel):
     title: str | None = Field(None, example="ミーティング")
     description: str | None = Field(None, example="詳細情報")
     unit: str | None = Field(None, example="全体")
-    user_id: int 
+    user_id: str
     mail_send: bool = Field(True, description="送信するフラグ")
     start: datetime | None = Field(datetime.now())
     end: datetime | None = Field(datetime.now())
@@ -30,7 +30,7 @@ class EventWithUserName(BaseModel):
     title: str | None = Field(None, example="ミーティング")
     description: str | None = Field(None, example="詳細情報")
     unit: str | None = Field(None, example="全体")
-    user_id: int 
+    user_id: str
     user_name: str
     mail_send: bool = Field(True, description="送信するフラグ")
     start: datetime | None = Field(datetime.now())
@@ -40,7 +40,6 @@ class EventUpdateBase(BaseModel):
     title: str
     description: str
     unit: str
-    user_id: int 
     mail_send: bool
     start: datetime
     end: datetime

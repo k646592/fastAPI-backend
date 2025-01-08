@@ -29,7 +29,7 @@ async def get_events(db: AsyncSession) -> list[event_model.Event]:
         for event in events
     ]
 
-async def get_user(db: AsyncSession, user_id: int) -> user_model.User | None:
+async def get_user(db: AsyncSession, user_id: str) -> user_model.User | None:
     result: Result = await db.execute(
         select(user_model.User).filter(user_model.User.id == user_id)
     )
@@ -56,7 +56,6 @@ async def update_event(
     original.title = event_update.title
     original.description = event_update.description
     original.unit = event_update.unit
-    original.user_id = event_update.user_id
     original.start = event_update.start
     original.end = event_update.end
     original.mail_send = event_update.mail_send

@@ -8,11 +8,10 @@ class UserBase(BaseModel):
    group: str | None = Field(None, example="Web班")
    name: str | None = Field(None, example="アルゴリズム")
    status: str | None = Field(None, example="出席")
-   firebase_user_id: str
-   file_name: str
-   bytes_data: bytes
    now_location: str | None = Field(None, example="キャンパス外")
    location_flag: bool
+   image_name: str
+   image_url: str
 
 
 class UserCreate(UserBase):
@@ -20,7 +19,7 @@ class UserCreate(UserBase):
 
 
 class UserCreateResponse(UserCreate):
-   id: int
+   id: str
 
 
    class Config:
@@ -35,20 +34,20 @@ class UserUpdate(UserUpdateBase):
    pass
 
 class UserUpdateResponse(UserUpdate):
-   id: int
+   id: str
 
    class Config:
       from_attributes = True
 
 class UserUpdateImageBase(BaseModel):
-   file_name: str
-   bytes_data: bytes
+   image_name: str
+   image_url: str
 
 class UserUpdateImage(UserUpdateImageBase):
    pass
 
 class UserUpdateImageResponse(UserUpdateImage):
-   id: int
+   id: str
 
    class Config:
       from_attributes = True
@@ -60,27 +59,26 @@ class UserUpdateEmail(UserUpdateEmailBase):
    pass
 
 class UserUpdateEmailResponse(UserUpdateEmail):
-   id: int
+   id: str
 
    class Config:
       from_attributes = True
 
 class User(UserBase):
-   id: int
+   id: str
 
    class Config:
        from_attributes = True
 
 class UserInGroupChat(BaseModel):
-   id: int
+   id: str
    email: str
    grade: str
    group: str
    name: str
    status: str
-   firebase_user_id: str
-   file_name: str
-   bytes_data: bytes
+   image_name: str
+   image_url: str
    joined_date: datetime | None
    leave_date: datetime | None
    join: bool
@@ -89,49 +87,27 @@ class UserInGroupChat(BaseModel):
       from_attributes = True
 
 class UserGetBase(BaseModel):
-   id: int 
    email: str | None = Field(None, example="example@email.com")
    grade: str | None = Field(None, example="B4")
    group: str | None = Field(None, example="Web班")
    name: str | None = Field(None, example="アルゴリズム")
    status: str | None = Field(None, example="出席")
-   file_name: str
+   image_name: str
+   image_url: str
    now_location: str
    location_flag: bool
-   bytes_data: bytes
-
 
 class UserGet(UserGetBase):
-   firebase_user_id: str
-
-
-   class Config:
-       from_attributes = True
-
-class UserGetIdBase(BaseModel):
-   id: int
-
-class UserGetId(UserGetIdBase):
-   firebase_user_id: str
-
-   class Config:
-      from_attributes = True
-
-class UserGetNameIdBase(BaseModel):
-   id: int
-   name: str
-
-class UserGetNameId(UserGetNameIdBase):
-   firebase_user_id: str
-
-   class Config:
-      from_attributes = True
+   id: str
 
 class UserGetNameBase(BaseModel):
    name:str
 
+   class Config:
+      from_attributes = True
+
 class UserGetName(UserGetNameBase):
-   id: int
+   id: str
 
    class Config:
       from_attributes = True
@@ -143,7 +119,7 @@ class UserUpdateLocation(UserUpdateLocationBase):
    pass
 
 class UserUpdateLocationResponse(UserUpdateLocation):
-   firebase_user_id: str
+   id: str
 
    class Config:
       from_attributes = True

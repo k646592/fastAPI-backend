@@ -4,7 +4,7 @@ from datetime import datetime
 class AttendanceBase(BaseModel):
    title: str | None = Field(None, example="遅刻")
    description: str | None = Field(None, example="詳細情報")
-   user_id: int 
+   user_id: str
    mail_send: bool = Field(True, description="送信するフラグ")
    undecided: bool = Field(False, description="未定フラグ")
    start: datetime | None = Field(datetime.now())
@@ -29,7 +29,7 @@ class AttendanceWithUserName(BaseModel):
     id: int
     title: str | None = Field(None, example="ミーティング")
     description: str | None = Field(None, example="詳細情報")
-    user_id: int 
+    user_id: str
     user_name: str
     mail_send: bool = Field(True, description="送信するフラグ")
     start: datetime | None = Field(datetime.now())
@@ -39,7 +39,6 @@ class AttendanceWithUserName(BaseModel):
 class AttendanceUpdateBase(BaseModel):
     title: str
     description: str
-    user_id: int 
     mail_send: bool
     start: datetime
     end: datetime
@@ -60,7 +59,7 @@ class UserAttendanceBase(BaseModel):
    group: str
 
 class UserAttendance(UserAttendanceBase):
-   id: int
+   id: str
 
    class Config:
        from_attributes = True
@@ -72,7 +71,7 @@ class UserUpdateStatus(UserUpdateStatusBase):
    pass
 
 class UserUpdateStatusResponse(UserUpdateStatus):
-   id: int
+   id: str
 
    class Config:
       from_attributes = True

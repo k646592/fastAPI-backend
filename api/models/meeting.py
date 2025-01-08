@@ -11,7 +11,7 @@ class Meeting(Base):
     created_at = Column(DateTime)
     team = Column(String(4096))
     main_text = Column(Text)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String(32), ForeignKey("users.id"), nullable=False)
     kinds = Column(String(1024))
 
     user = relationship("User", back_populates="meetings")

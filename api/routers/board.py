@@ -53,7 +53,7 @@ async def websocket_board_endpoint(websocket: WebSocket):
 
 @router.get("/boards/{user_id}/", response_model=list[board_schema.BoardWithOtherInfo])
 async def list_boards(
-    user_id: int,
+    user_id: str,
     page: int = Query(1, ge=1),
     db: AsyncSession = Depends(get_db)
 ):
@@ -145,7 +145,7 @@ async def create_acknowledgement(
 @router.delete("/acknowledgements/{board_id}/{user_id}", response_model=None)
 async def delete_acknowledgement(
     board_id: int,
-    user_id: int,
+    user_id: str,
     db: AsyncSession = Depends(get_db)
 ):
     acknowledgement = await board_crud.get_acknowledgement_by_board_and_user(db, board_id=board_id, user_id=user_id)

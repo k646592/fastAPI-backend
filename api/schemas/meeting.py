@@ -6,7 +6,7 @@ class MeetingBase(BaseModel):
     created_at: datetime | None = Field(datetime.now())
     team: str | None = Field(None, example="All")
     main_text: str 
-    user_id: int
+    user_id: str
     kinds: str | None = Field(None, example="ミーティング")
 
 class MeetingCreate(MeetingBase):
@@ -39,7 +39,7 @@ class MeetingWithUserName(BaseModel):
     created_at: datetime
     team: str
     main_text: str
-    user_id: int
+    user_id: str
     user_name: str
     kinds: str
 

@@ -7,7 +7,7 @@ import api.models.user as user_model
 import api.models.board as board_model
 import api.schemas.board as board_schema
 
-async def get_boards(db: AsyncSession, user_id: int, page: int) -> list[board_model.Board]:
+async def get_boards(db: AsyncSession, user_id: str, page: int) -> list[board_model.Board]:
     # OFFSET計算: (ページ番号 - 1) * ページサイズ
     offset = (page - 1) * 10
 
@@ -65,7 +65,7 @@ async def get_boards(db: AsyncSession, user_id: int, page: int) -> list[board_mo
         for board in boards
     ]
 
-async def get_user(db: AsyncSession, user_id: int) -> user_model.User | None:
+async def get_user(db: AsyncSession, user_id: str) -> user_model.User | None:
     result: Result = await db.execute(
         select(user_model.User).filter(user_model.User.id == user_id)
     )
@@ -100,7 +100,8 @@ async def get_acknowledged_users(db: AsyncSession, board_id: int) -> list[dict]:
         select(
             board_model.Acknowledgement.user_id,
             user_model.User.name,
-            user_model.User.bytes_data,
+            user_model.User.image_url,
+            user_model.User.image_name,
             board_model.Acknowledgement.created_at  
         )
         .join(user_model.User, user_model.User.id == board_model.Acknowledgement.user_id)  # User テーブルと結合
@@ -114,7 +115,8 @@ async def get_acknowledged_users(db: AsyncSession, board_id: int) -> list[dict]:
         board_schema.AcknowledgementsWithUserInfo(
             user_id=user.user_id,
             user_name=user.name,
-            bytes_data=user.bytes_data,
+            image_url=user.image_url,
+            image_name=user.image_name,
             created_at=user.created_at,  
         )
         for user in users
@@ -130,7 +132,7 @@ async def create_acknowledgement(
     return acknowledgement
 
 async def get_acknowledgement_by_board_and_user(
-    db: AsyncSession, board_id: int, user_id: int
+    db: AsyncSession, board_id: int, user_id: str
 ) -> board_model.Acknowledgement | None:
     result: Result = await db.execute(
         select(board_model.Acknowledgement)

@@ -1,19 +1,18 @@
-from sqlalchemy import Column, Integer, String, LargeBinary, Boolean
+from sqlalchemy import Column, String, Boolean, Text
 from sqlalchemy.orm import relationship
 from api.db import Base
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(32), primary_key=True, index=True)  # firebaseのuid
     email = Column(String(1024))
     grade = Column(String(256))
     group = Column(String(256))
     name = Column(String(1024))
     status = Column(String(256))
-    firebase_user_id = Column(String(1024))
-    file_name = Column(String(256))
-    bytes_data = Column(LargeBinary(length=(2**32)-1))
+    image_name = Column(Text)
+    image_url = Column(Text)
     now_location = Column(String(256))
     location_flag = Column(Boolean)
 
@@ -26,3 +25,4 @@ class User(Base):
     meetings = relationship("Meeting", back_populates="user")
     boards = relationship("Board", back_populates="user")
     acknowledgements = relationship("Acknowledgement", back_populates="user")
+    unread_messages = relationship("UnreadMessage", back_populates="user", cascade="all, delete-orphan")

@@ -83,7 +83,7 @@ async def list_attendance_users(db: AsyncSession = Depends(get_db)):
 
 @router.patch("/update_user_status/{user_id}", response_model=attendance_schema.UserUpdateStatusResponse)
 async def update_user_status(
-    user_id: int,
+    user_id: str,
     update_status_body: attendance_schema.UserUpdateStatus,
     db: AsyncSession = Depends(get_db)
 ):

@@ -4,14 +4,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from datetime import datetime
+from sqlalchemy import desc  # descをインポートする
 
 import api.models.meeting as meeting_model
 import api.schemas.meeting as meeting_schema
 
-async def get_meetings(db: AsyncSession) -> list[meeting_schema.MeetingWithUserName]:
+async def get_meetings(
+        team: str, 
+        kinds: str,
+        db: AsyncSession
+) -> list[meeting_schema.MeetingWithUserName]:
     result = await db.execute(
         select(meeting_model.Meeting)
         .options(joinedload(meeting_model.Meeting.user))
+        .where(
+            meeting_model.Meeting.team == team,
+            meeting_model.Meeting.kinds == kinds
+        )  # teamとkindsの値が一致する条件を追加
+        .order_by(desc(meeting_model.Meeting.created_at))  # created_atの降順に指定
     )
     
     meetings = result.scalars().all()
