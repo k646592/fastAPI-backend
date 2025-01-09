@@ -163,7 +163,7 @@ async def update_user_image(
         image_url = f"http://localhost:9000/{MINIO_BUCKET}/{image_name}"
         try:
             # MinIOから画像を削除
-            await delete_user_image(user_id=user_id, image_name=user.image_name)
+            await delete_user_image(image_name=user.image_name)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")
     else:
@@ -254,9 +254,9 @@ async def delete_user(user_id: str, db: AsyncSession = Depends(get_db)):
 
 
 # 画像削除用の関数
-async def delete_user_image(user_id: str, image_name: str):
+async def delete_user_image(image_name: str):
     try:
         # MinIOから画像を削除
-        minio_client.remove_object(MINIO_BUCKET, f"{user_id}/{image_name}")
+        minio_client.remove_object(MINIO_BUCKET, f"{image_name}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")
