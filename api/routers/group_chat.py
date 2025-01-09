@@ -5,14 +5,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from api.db import get_db
 from datetime import datetime
 import json
-import base64
-import pytz
 from minio import Minio
 
 import api.cruds.group_chat as chat_crud
 
 import api.schemas.group_chat as chat_schema
 import api.schemas.user as user_schema
+
+import api.routers.chat as total_chat
 
 # MinIO client configuration
 MINIO_URL = "minio:9000"
@@ -311,6 +311,7 @@ async def create_private_message(
         }
         for user_id in other_user_ids :
             await chat_user_manager.broadcast({"type": "broadcast", "message": user_message}, user_id)
+            await total_chat.chat_user_total_manager.broadcast({"type": "broadcast", "message": user_message}, user_id)
         
         return new_message
     except SQLAlchemyError as e:

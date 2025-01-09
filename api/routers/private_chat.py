@@ -11,6 +11,8 @@ from minio import Minio
 import api.schemas.private_chat as chat_schema
 import api.schemas.user as user_schema
 
+import api.routers.chat as total_chat
+
 # MinIO client configuration
 MINIO_URL = "minio:9000"
 MINIO_ACCESS_KEY = "minioadmin"
@@ -285,6 +287,7 @@ async def create_private_message(
             "user_id": new_message.user_id,
         }
         await chat_user_manager.broadcast({"type": "broadcast", "message": user_message}, other_user_id)
+        await total_chat.chat_user_total_manager.broadcast({"type": "broadcast", "message": user_message}, other_user_id)
 
         return new_message
     except SQLAlchemyError as e:
