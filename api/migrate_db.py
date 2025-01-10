@@ -11,6 +11,8 @@ from api.models.private_chat import Base
 from api.models.meeting import Base
 from api.models.door_state_manager import Base
 from api.models.group_chat import Base
+from api.models.device_info import Base
+from api.models.seat import Base
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

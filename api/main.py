@@ -7,7 +7,7 @@ import os
 import logging
 
 from api.db import async_session
-from api.routers import event, private_chat, user, attendance, mail, meeting, door_state_manager, board, group_chat, chat
+from api.routers import event, private_chat, user, attendance, mail, meeting, door_state_manager, board, group_chat, chat, device_info, seat
 import api.cruds.attendance as attendance_crud
 
 app = FastAPI()
@@ -68,3 +68,5 @@ app.include_router(door_state_manager.router)
 app.include_router(board.router)
 app.include_router(group_chat.router)
 app.include_router(chat.router)
+app.include_router(device_info.router)
+app.include_router(seat.router)

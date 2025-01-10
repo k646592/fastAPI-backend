@@ -26,3 +26,4 @@ class User(Base):
     boards = relationship("Board", back_populates="user")
     acknowledgements = relationship("Acknowledgement", back_populates="user")
     unread_messages = relationship("UnreadMessage", back_populates="user", cascade="all, delete-orphan")
+    device_info = relationship("DeviceInfo", back_populates="user", uselist=False)
