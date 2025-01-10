@@ -129,6 +129,16 @@ async def create_acknowledgement(
     acknowledgement_body: board_schema.AcknowledgementCreate, db: AsyncSession = Depends(get_db)
 ):
     try:
+        # 一意性の確認
+        exists = await board_crud.check_acknowledgement_exists(
+            db, acknowledgement_body.board_id, acknowledgement_body.user_id
+        )
+        if exists:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Acknowledgement already exists for board_id {acknowledgement_body.board_id} and user_id {acknowledgement_body.user_id}"
+            )
+        
         new_acknowledgement = await board_crud.create_acknowledgement(db, acknowledgement_create=acknowledgement_body)
 
         # 更新が成功した後、WebSocketを通じてユーザーにメッセージを送信

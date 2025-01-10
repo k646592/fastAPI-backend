@@ -122,6 +122,21 @@ async def get_acknowledged_users(db: AsyncSession, board_id: int) -> list[dict]:
         for user in users
     ]
 
+async def check_acknowledgement_exists(
+        db: AsyncSession, board_id: int, user_id: str
+) -> bool:
+    """
+    指定されたboard_idとuser_idの組み合わせが存在するか確認する。
+    """
+    existing_acknowledgement_query = await db.execute(
+        select(board_model.Acknowledgement).where(
+            board_model.Acknowledgement.board_id == board_id,
+            board_model.Acknowledgement.user_id == user_id
+        )
+    )
+    existing_acknowledgement = existing_acknowledgement_query.scalars().first()
+    return existing_acknowledgement is not None
+
 async def create_acknowledgement(
         db: AsyncSession, acknowledgement_create: board_schema.AcknowledgementCreate
 ) -> board_model.Acknowledgement:

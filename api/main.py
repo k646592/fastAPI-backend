@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 origins = [
     os.getenv("FRONTEND_DOMAIN", "http://localhost"),
     os.getenv("FRONTEND_DOMAIN_DEV", "http://localhost:8000"),
-    os.getenv("FRONTEND_DOMAIN_DEV_ALT", "http://localhost:61411")
+    os.getenv("FRONTEND_DOMAIN_DEV_ALT", "http://localhost:64163")
 ]
 
 app.add_middleware(
