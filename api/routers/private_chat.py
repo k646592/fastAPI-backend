@@ -169,7 +169,7 @@ async def message_unread_update_websocket(
     await manager.broadcast({"type": "message_unread_websocket", "message": message}, private_chat_room_id)
     return private_message_unread
 
-@router.get("/private_messages/{private_chat_room_id}", response_model=list[chat_schema.PrivateMessage])
+@router.get("/private_messages/{private_chat_room_id}/", response_model=list[chat_schema.PrivateMessage])
 async def get_chat_messages(
     private_chat_room_id: int, 
     page: int = Query(1, ge=1),

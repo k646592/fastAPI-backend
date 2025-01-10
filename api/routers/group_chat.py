@@ -373,7 +373,7 @@ async def create_unread_messages(
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-@router.get("/group_messages/{group_chat_room_id}", response_model=list[chat_schema.GroupMessage])
+@router.get("/group_messages/{group_chat_room_id}/", response_model=list[chat_schema.GroupMessage])
 async def get_group_chat_messages(
     group_chat_room_id: int, 
     page: int = Query(1, ge=1),
