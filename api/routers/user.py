@@ -161,11 +161,13 @@ async def update_user_image(
             content_type=image.content_type,
         )
         image_url = f"http://localhost:9000/{MINIO_BUCKET}/{image_name}"
-        try:
-            # MinIOから画像を削除
-            await delete_user_image(image_name=user.image_name)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")
+        
+        if user.image_url == "" or user.image_name == "" :
+            try:
+                # MinIOから画像を削除
+                await delete_user_image(image_name=user.image_name)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")
     else:
         image_name = ""
         image_url = ""
