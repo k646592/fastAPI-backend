@@ -162,7 +162,7 @@ async def update_user_image(
         )
         image_url = f"http://localhost:9000/{MINIO_BUCKET}/{image_name}"
         
-        if user.image_url == "" or user.image_name == "" :
+        if user.image_url != "" or user.image_name != "" :
             try:
                 # MinIOから画像を削除
                 await delete_user_image(image_name=user.image_name)
