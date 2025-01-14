@@ -31,3 +31,7 @@ async def bulk_update_or_create_seats_and_get_all(
     result = await db.execute(select(seat_model.Seat))
     all_seats = result.scalars().all()
     return all_seats
+
+async def get_seats(db: AsyncSession) -> list[seat_model.Seat]:
+    result = await db.execute(select(seat_model.Seat))
+    return result.scalars().all()

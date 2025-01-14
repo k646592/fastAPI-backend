@@ -7,6 +7,7 @@ from api.db import get_db
 
 import api.schemas.device_info as device_schema
 
+
 router = APIRouter()
 
 
@@ -22,3 +23,8 @@ async def create_device_info(
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
+
+@router.get("/mac_addresses")
+async def read_mac_addresses():
+    mac_addresses = await device_crud.get_mac_addresses()
+    return {"mac_addresses": mac_addresses}

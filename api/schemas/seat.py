@@ -10,3 +10,7 @@ class SeatResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class Seat(BaseModel):
+    id: int
+    status: str
