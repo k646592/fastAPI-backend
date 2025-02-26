@@ -29,3 +29,4 @@ class User(Base):
     device_info = relationship("DeviceInfo", back_populates="user", uselist=False)
     sent_reports = relationship("Report", foreign_keys="[Report.user_id]", back_populates="user")
     received_reports = relationship("Report", foreign_keys="[Report.recipient_user_id]", back_populates="recipient_user")
+    supervisor = relationship("Supervisor", back_populates="user", uselist=False)
