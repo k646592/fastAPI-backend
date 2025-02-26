@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class DeviceInfoBase(BaseModel):
     user_id: str
-    host_name: str
+    mac_address: str
 
 class DeviceInfoCreate(DeviceInfoBase):
     pass
@@ -15,7 +15,7 @@ class DeviceInfoCreateResponse(DeviceInfoCreate):
 
 class DeviceInfoUpdateBase(BaseModel):
     user_id: str
-    host_name: str
+    mac_address: str
 
 class DeviceInfoUpdate(DeviceInfoUpdateBase):
     pass

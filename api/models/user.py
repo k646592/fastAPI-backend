@@ -27,3 +27,5 @@ class User(Base):
     acknowledgements = relationship("Acknowledgement", back_populates="user")
     unread_messages = relationship("UnreadMessage", back_populates="user", cascade="all, delete-orphan")
     device_info = relationship("DeviceInfo", back_populates="user", uselist=False)
+    sent_reports = relationship("Report", foreign_keys="[Report.user_id]", back_populates="user")
+    received_reports = relationship("Report", foreign_keys="[Report.recipient_user_id]", back_populates="recipient_user")

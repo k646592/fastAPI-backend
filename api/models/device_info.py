@@ -7,6 +7,6 @@ class DeviceInfo(Base):
 
     id = Column(Integer, primary_key=True, index=True)  # firebaseのuid
     user_id = Column(String(32), ForeignKey("users.id"), nullable=False, index=True)
-    host_name = Column(Text, nullable=False)
+    mac_address = Column(Text, nullable=False)
 
     user = relationship("User", back_populates="device_info")
